@@ -18,7 +18,6 @@ const corsConfig = {
 app.use(cors(corsConfig));
 app.use(morgan('dev'));
 
-// Добавьте этот middleware для логирования
 app.use((req, res, next) => {
   console.log('URL запроса:', req.url);
   console.log('Метод запроса:', req.method);
@@ -33,12 +32,11 @@ app.use(express.json());
 app.use('/api/v1', apiRouter);
 
 
-// Обработка ошибок всегда должна быть в конце
 app.use((err, req, res, next) => {
   console.error('Произошла ошибка:', err);
   res.status(500).json({ message: 'Внутренняя ошибка сервера' });
 });
 
 app.listen(PORT, () => {
-  console.log(`Server started at ${PORT} port`);
+  console.log(`Сервер запущен на порту ${PORT}`);
 });
