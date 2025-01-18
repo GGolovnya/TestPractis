@@ -1,0 +1,1 @@
+// passwordValidator.ts - Валидация паролей

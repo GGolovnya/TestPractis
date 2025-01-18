@@ -1,0 +1,1 @@
+// - emailValidator.ts - Валидация email

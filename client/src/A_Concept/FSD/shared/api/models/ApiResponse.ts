@@ -1,0 +1,1 @@
+// ApiResponse.ts - Интерфейс ответа API

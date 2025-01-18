@@ -1,0 +1,1 @@
+// - user.slice.ts - Redux slice для пользователя

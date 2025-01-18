@@ -1,0 +1,1 @@
+// useLocalStorage.ts - Хук для работы с localStorage
