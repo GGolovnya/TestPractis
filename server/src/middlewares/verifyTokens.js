@@ -4,7 +4,7 @@ const verifyRefreshToken = (req, res, next) => {
   try {
     const refreshToken = req.cookies?.refreshToken;
     if (!refreshToken) {
-      console.warn("Refresh token is missing");
+      console.warn("Refresh token потерян");
       return res.status(401).json({ message: "Refresh token is required" });
     }
 
