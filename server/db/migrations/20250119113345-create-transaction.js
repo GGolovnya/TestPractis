@@ -13,7 +13,7 @@ module.exports = {
         allowNull: false
       },
       type: {
-        type: Sequelize.ENUM('income', 'expense', 'transfer'),
+        type: Sequelize.ENUM('доход', 'расход', 'перевод'),
         allowNull: false
       },
       category: {
