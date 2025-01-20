@@ -4,7 +4,6 @@ const { Model } = require('sequelize');
 module.exports = (sequelize, DataTypes) => {
   class DataTypesExample extends Model {
     static associate(models) {
-      // определить связи здесь если нужно
     }
   }
   

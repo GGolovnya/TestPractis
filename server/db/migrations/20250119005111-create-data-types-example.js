@@ -1,4 +1,3 @@
-// migrations/XXXXXX-create-data-types-example.js
 'use strict';
 module.exports = {
   up: async (queryInterface, Sequelize) => {
