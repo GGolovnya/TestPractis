@@ -30,31 +30,6 @@ router.use('/animals', animals);
 module.exports = router;
 ```
 
-### Именование маршрутов и файлов
-#### Маршруты в api.router.js:
-```javascript
-// Правильно (множественное число)
-router.use('/animals', animalRouter);
-router.use('/users', userRouter);
-
-// Менее предпочтительно (единственное число)
-router.use('/animal', animalRouter);
-router.use('/user', userRouter);
-```
-
-#### Именование файлов роутеров:
-Рекомендуется использовать единственное число в названиях файлов:
-```
-✓ animal.api.router.js
-✓ user.api.router.js
-✓ token.api.router.js
-
-// Не рекомендуется
-✗ animals.api.router.js
-✗ users.api.router.js
-✗ tokens.api.router.js
-```
-
 ## 2. Основные HTTP методы
 
 - GET - получение данных
@@ -298,6 +273,69 @@ const orders = await Order.findAll({
     attributes: ['name', 'email']
   }]
 });
+```
+
+### Операторы сравнения (Op)
+Sequelize предоставляет специальный объект Op для построения условий в запросах:
+
+```javascript
+const { Op } = require('sequelize');
+
+// Примеры использования операторов
+const records = await Model.findAll({
+  where: {
+    field: {
+      // Точное сравнение
+      [Op.eq]: value,     // = (равно) - поиск точных совпадений (например, status === 'active')
+      [Op.ne]: value,     // != (не равно) - исключение определенных значений
+      
+      // Числовые сравнения
+      [Op.gt]: value,     // > (больше) - фильтрация по возрасту, цене, дате
+      [Op.lt]: value,     // < (меньше) - ограничение максимального значения
+      [Op.gte]: value,    // >= (больше или равно) - включая граничное значение
+      [Op.lte]: value,    // <= (меньше или равно) - диапазоны цен, возрастные ограничения
+      
+      // Текстовый поиск
+      [Op.like]: '%value%',    // LIKE - поиск подстроки (регистрозависимый)
+      [Op.iLike]: '%value%',   // ILIKE - поиск подстроки без учета регистра
+      
+      // Работа со списками
+      [Op.in]: [1, 2, 3],      // IN - поиск по списку допустимых значений
+      [Op.notIn]: [1, 2, 3],   // NOT IN - исключение списка значений
+      
+      // Диапазоны
+      [Op.between]: [1, 10],   // BETWEEN - фильтрация по диапазону (цены, даты)
+      [Op.notBetween]: [1, 10] // NOT BETWEEN - исключение диапазона значений
+    }
+  }
+});
+```
+
+### Именование маршрутов и файлов
+Следуйте REST API конвенциям:
+
+#### Маршруты в api.router.js:
+```javascript
+// Правильно (множественное число)
+router.use('/animals', animalRouter);
+router.use('/users', userRouter);
+
+// Менее предпочтительно (единственное число)
+router.use('/animal', animalRouter);
+router.use('/user', userRouter);
+```
+
+#### Именование файлов роутеров:
+Рекомендуется использовать единственное число в названиях файлов:
+```
+✓ animal.api.router.js
+✓ user.api.router.js
+✓ token.api.router.js
+
+// Не рекомендуется
+✗ animals.api.router.js
+✗ users.api.router.js
+✗ tokens.api.router.js
 ```
 
 ## 10. Полезные ссылки

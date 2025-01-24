@@ -1,10 +1,26 @@
 const router = require('express').Router();
+const { Op } = require ('sequelize')
 const { Animal } = require('../../db/models');
-
 // Получение всех животных
 router.get('/', async (req, res, next) => {
   try {
-    const animals = await Animal.findAll();
+
+    const {sort, filter } = req.query;
+    let options = {};
+
+    if(sort) {
+      options.order = [[sort, 'ASC']];
+    }
+
+    if (filter) {
+      options.where = {
+        name: {
+          [Op.iLike]: `%${filter}%`
+        }
+      };
+    }
+
+    const animals = await Animal.findAll(options);
     res.json(animals);
   } catch (error) {
     next(error);
