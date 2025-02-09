@@ -51,7 +51,7 @@ Middleware для валидации ресурсов:
 ## Пример использования
 
 ```javascript
-const { verifyAccessToken, verifyAdmin } = require('./middlewares/verifyTokens');
+const { verifyAccessToken, verifyAdmin } = require ('./middlewares/verifyTokens');
 
 router.get('/protected',
   verifyAccessToken,  // Сначала проверяем токен
