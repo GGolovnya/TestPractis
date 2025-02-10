@@ -5,3 +5,6 @@ function curry(a) {
         };
     };
 }
+
+const functionCurry1 = curry('Текст 1 / ')
+console.log(functionCurry1('Текст 2 / '))
