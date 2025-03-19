@@ -1,11 +1,14 @@
-import './styles/App.css'
-import {HomePage} from './Pages/HomePage'
+// src/App.tsx
+import { Routes, Route } from 'react-router-dom';
+import { HomePage } from './Pages/HomePage';
+import { AccordionOptimization } from './Pages/AccordionOptimization';
 
 function App() {
   return (
-    <>
-      <HomePage />
-    </>
+    <Routes>
+      <Route path="/" element={<HomePage />} />
+      <Route path="/accordion" element={<AccordionOptimization />} />
+    </Routes>
   )
 }
 
