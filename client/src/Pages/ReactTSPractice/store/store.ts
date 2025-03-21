@@ -1,9 +1,9 @@
-
 // src/store/store.ts
 import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
+import { persist, PersistOptions } from 'zustand/middleware';
 import { compress, decompress } from 'lz-string';
-import { StoreState, ChunkData } from '../types';
+import { StoreState } from '../types';
+import { generateMockData } from '../mock/mock';
 
 const CHUNK_SIZE = 100;
 
@@ -18,10 +18,9 @@ export const useStore = create(
       loadChunk: async (chunkId: number) => {
         if (get().loadedChunks[chunkId]) return;
         
-        const response = await fetch(`/api/data/chunk/${chunkId}`);
-        const chunkData: ChunkData = await response.json();
+        const chunkData = generateMockData(chunkId);
         
-        set(state => ({
+        set((state) => ({
           data: { 
             ...state.data,
             [chunkId]: compress(JSON.stringify(chunkData))
@@ -40,20 +39,20 @@ export const useStore = create(
       },
 
       setBlockOpen: (id: number, isOpen: boolean) => 
-        set(state => ({
+        set((state) => ({
           openBlocks: { ...state.openBlocks, [id]: isOpen }
         })),
 
-      setResult: (id: number, result: any) => 
-        set(state => ({
+      setResult: (id: number, result: unknown) => 
+        set((state) => ({
           results: { ...state.results, [id]: result }
         }))
     }),
     {
       name: 'accordion-storage',
-      getStorage: () => localStorage,
-      serialize: (state) => compress(JSON.stringify(state)),
-      deserialize: (str) => JSON.parse(decompress(str))
-    }
+      storage: localStorage,
+      serialize: (state: StoreState) => compress(JSON.stringify(state)),
+      deserialize: (str: string) => JSON.parse(decompress(str))
+    } as unknown as PersistOptions<StoreState, StoreState>
   )
 );

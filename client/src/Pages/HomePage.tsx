@@ -1,16 +1,29 @@
+// src/Pages/HomePage.tsx
 import { useNavigate } from 'react-router-dom';
+import './HomePage.css';
 
 export function HomePage() {
   const navigate = useNavigate();
   
   return (
-    <>
-      <h1>HomePage - стартовая страница</h1>
-      <p>Тут типа будет расположена какая то верстка страница</p>
-      <p>Ну и ссылки на страницы</p>
-      <button onClick={() => navigate('/accordion')}>
-        Страница с сложным компонентом
-      </button>
-    </>
-  )
+    <div className="home-page">
+      <header className="home-header">
+        <h1>Добро пожаловать</h1>
+      </header>
+      <main className="home-content">
+        <section className="welcome-section">
+          <p>Добро пожаловать на нашу демонстрационную страницу!</p>
+          <p>Здесь вы можете ознакомиться с различными компонентами.</p>
+        </section>
+        <nav className="navigation-links">
+          <button 
+            className="nav-button"
+            onClick={() => navigate('/accordion')}
+          >
+            Перейти к аккордеону
+          </button>
+        </nav>
+      </main>
+    </div>
+  );
 }

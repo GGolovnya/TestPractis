@@ -1,0 +1,67 @@
+/* src/components/StatisticsBlock.css */
+/* Контейнер для блока статистики */
+.statistics-block {
+  padding: 15px;
+  color: rgba(255, 255, 255, 0.87);
+  position: relative;
+  min-height: 100px; /* Добавляем минимальную высоту */
+}
+
+/* Сообщение об ошибке */
+.error-message {
+  color: #ff4444;
+  text-align: center;
+  padding: 20px;
+  position: relative;
+}
+
+/* Кнопка повтора вычислений */
+.retry-button {
+  background-color: #ff4444;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-top: 10px;
+  position: relative;
+}
+
+.retry-button:hover {
+  background-color: #cc0000;
+}
+
+/* Сетка результатов */
+.results-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 15px;
+  padding: 10px;
+  position: relative;
+}
+
+/* Элемент результата */
+.result-item {
+  background-color: #333;
+  padding: 15px;
+  border-radius: 4px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  color: rgba(255, 255, 255, 0.87);
+  position: relative;
+}
+
+.result-item strong {
+  color: #646cff;
+  font-size: 14px;
+}
+
+/* Сообщение о загрузке */
+.loading-message {
+  text-align: center;
+  color: rgba(255, 255, 255, 0.6);
+  padding: 20px;
+  position: relative;
+  min-height: 60px; /* Минимальная высота для сообщения о загрузке */
+}

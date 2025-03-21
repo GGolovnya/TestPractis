@@ -1,0 +1,66 @@
+/* src/components/AccordionBlock.css */
+/* Контейнер для каждого блока аккордеона */
+.accordion-block {
+  margin: 10px;
+  border-radius: 6px;
+  overflow: hidden;
+  background-color: #2a2a2a;
+  border: 1px solid #444;
+  position: relative;
+  min-height: 50px; /* Добавлено минимальную высоту */
+  display: block; /* Гарантируем блочное отображение */
+}
+
+/* Стили кнопки аккордеона */
+.accordion-button {
+  width: 100%;
+  padding: 12px 15px;
+  display: flex;
+  align-items: center;
+  background-color: #333;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  color: rgba(255, 255, 255, 0.87);
+  position: relative;
+}
+
+/* Эффект при наведении на кнопку */
+.accordion-button:hover {
+  background-color: #444;
+}
+
+/* Стили кнопки в открытом состоянии */
+.accordion-button.open {
+  background-color: #1a1a1a;
+}
+
+/* Иконка открытия/закрытия блока */
+.accordion-icon {
+  margin-right: 10px;
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+/* Заголовок блока */
+.accordion-title {
+  font-size: 16px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.87);
+}
+
+/* Контейнер для контента аккордеона */
+.accordion-content {
+  padding: 15px;
+  background-color: #2a2a2a;
+  border-top: 1px solid #444;
+  position: relative;
+}
+
+/* Индикатор загрузки */
+.loading-indicator {
+  text-align: center;
+  padding: 20px;
+  color: rgba(255, 255, 255, 0.6);
+  position: relative;
+}
