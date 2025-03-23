@@ -1,9 +1,10 @@
 // src/Pages/AccordionOptimization.tsx
 import React from 'react';
-import { AccordionContainer } from './ReactTSPractice/components/AccordionContainer';
+import { AccordionContainer } from '../components/AccordionContainer';
 import './AccordionOptimization.css';
 
 export const AccordionOptimization: React.FC = () => {
+  console.log('AccordionOptimization рендерится');
   return (
     <div className="page-container">
       <header className="page-header">
