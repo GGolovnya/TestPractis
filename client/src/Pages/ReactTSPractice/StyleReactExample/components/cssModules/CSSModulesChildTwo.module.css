@@ -1,0 +1,30 @@
+.buttonContainer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 0 10px;
+    gap: 20px;
+  }
+  
+  .button {
+    background-color: #4a5568; /* Серый фон */
+    color: white;
+    border-radius: 10px;
+    width: 300px;
+    padding: 10px;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  
+  .button:hover {
+    background-color: #718096;
+  }
+  
+  .buttonActive {
+    background-color: #ed64a6; /* Розовый оттенок */
+  }
+  
+  .buttonActive:hover {
+    background-color: #d53f8c;
+  }

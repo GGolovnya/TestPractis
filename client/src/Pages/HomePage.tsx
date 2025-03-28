@@ -20,7 +20,13 @@ export function HomePage() {
             className="nav-button"
             onClick={() => navigate('/accordion')}
           >
-            Перейти к аккордеону
+            Перейти к виртуализационному аккордеону
+          </button>
+          <button 
+            className="nav-button"
+            onClick={() => navigate('/stylereactexample')}
+          >
+            Перейти к StyleReactExample
           </button>
         </nav>
       </main>

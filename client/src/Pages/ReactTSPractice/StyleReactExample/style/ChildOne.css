@@ -1,0 +1,39 @@
+/* Контейнер для карточки */
+.ContainerCard {
+    display: flex;
+    border-radius: 20px;
+    overflow: visible;
+    margin-left: 10px;
+    margin-right: 10px;
+    gap: 10px;
+}
+
+/* Верхняя часть карточки с заголовком и текстом */
+.CardTop {
+    flex: 1; /* Оставляем базовый размер равным */
+    background-color: #f56565;
+    padding: 10px;
+    border-radius: 20px;
+    transition: transform 0.3s ease-in-out; /* Оставляем только transform в transition */
+}
+
+.CardTop:hover {
+    background-color: #c44343;
+    transform: scale(1.05); /* Увеличиваем только через scale */
+    z-index: 1;
+}
+
+/* Нижняя часть карточки с дополнительной информацией */
+.CardBottom {
+    flex: 1; /* Оставляем базовый размер равным */
+    background-color: #661d1d;
+    padding: 10px;
+    border-radius: 20px;
+    transition: transform 0.3s ease-in-out; /* Оставляем только transform в transition */
+}
+
+.CardBottom:hover {
+    background-color: #340e0e;
+    transform: scale(1.05); /* Увеличиваем только через scale */
+    z-index: 1;
+}

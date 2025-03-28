@@ -1,0 +1,18 @@
+.PageStyleReactExample {
+    background-color: rgb(55, 55, 55);
+    border-radius: 20px;
+    padding: 20px;
+    width: 100%;
+}
+
+.ContainerStyleReactExample {
+    background-color: rgb(71, 71, 71);
+    border-radius: 20px;
+}
+
+.ContainerComponentsExampleStyle {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    gap: 20px;
+}

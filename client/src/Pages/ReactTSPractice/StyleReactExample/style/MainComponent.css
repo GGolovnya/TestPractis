@@ -1,0 +1,19 @@
+/* Стиль главного контейнера */
+.mainContainer {
+	width: 600px;
+	height: 500px;
+	background-color: rgb(255, 255, 255);
+	border-radius: 20px;
+	display: flex;
+	flex-direction: column;
+	gap: 20px;
+
+}
+
+/* Стиль оглавления главного контейнера*/
+.mainContainer h1 {
+	size: 24px;
+	font-weight: bold;
+	color: rgb(43, 43, 43);
+	text-align: center;
+}

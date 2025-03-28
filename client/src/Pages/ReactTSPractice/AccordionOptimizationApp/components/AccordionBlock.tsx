@@ -20,11 +20,15 @@ export const AccordionBlock: React.FC<AccordionBlockProps> = React.memo(({ id })
     console.log(`AccordionBlock ${id} рендерится, открыт: ${isOpen}`);
 
     return (
-        <div className='buttonBlockOpenClose'>
-            <button onClick={handleBlockOpenClose}>
+        <div className='accordionBlock'>
+            <button 
+                onClick={handleBlockOpenClose}
+                className={`buttonBlockOpenClose ${isOpen ? 'open' : ''}`}>
                 {isOpen ? '▼' : '►'} Блок {id}
             </button>
-            {isOpen && <div>Содержимое </div>}
+            {isOpen && 
+                <div className="contentAccordionBlock">Содержимое </div>
+            }
         </div>
     );
 });

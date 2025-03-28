@@ -1,0 +1,32 @@
+.cardContainer {
+    display: flex;
+    border-radius: 20px;
+    margin: 0 10px;
+    gap: 10px;
+  }
+  
+  .cardTop {
+    flex: 1;
+    background-color: #f6ad55; /* Оранжевый оттенок */
+    padding: 10px;
+    border-radius: 20px;
+    transition: transform 0.3s ease-in-out;
+  }
+  
+  .cardTop:hover {
+    background-color: #ed8936;
+    transform: scale(1.05);
+  }
+  
+  .cardBottom {
+    flex: 1;
+    background-color: #dd6b20; /* Темно-оранжевый оттенок */
+    padding: 10px;
+    border-radius: 20px;
+    transition: transform 0.3s ease-in-out;
+  }
+  
+  .cardBottom:hover {
+    background-color: #c05621;
+    transform: scale(1.05);
+  }
