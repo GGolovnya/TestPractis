@@ -4,10 +4,11 @@ import { persist, createJSONStorage } from 'zustand/middleware';
 import { compress, decompress } from 'lz-string';
 import { StoreState } from '../types';
 import { generateMockData } from '../mock/mock';
+import { initializeWorker } from '../utils/workerSetup';
 
 const CHUNK_SIZE = 100;
+const MAX_WORKERS = 4; // Максимум одновременно работающих воркеров
 
-// Создаём кастомное хранилище с компрессией
 const compressedStorage = {
   getItem: (name: string): string | null | Promise<string | null> => {
     const str = localStorage.getItem(name);
@@ -62,19 +63,24 @@ export const useStore = create<StoreState>()(
         return chunkData ? chunkData[id % CHUNK_SIZE] : null;
       },
 
-      setBlockOpen: (id: number, isOpen: boolean) =>
+      setBlockOpen: (id: number, isOpen: boolean) => {
         set((state) => ({
           openBlocks: { ...state.openBlocks, [id]: isOpen }
-        })),
+        }));
+        if (isOpen && !get().results[id]) {
+          // Запускаем вычисление при открытии блока
+          workerQueue.addTask(id, get().getData(id));
+        }
+      },
 
-      setResult: (id: number, result: unknown) =>
+      setResult: (id: number, result: CalculationResult) =>
         set((state) => ({
           results: { ...state.results, [id]: result }
         }))
     }),
     {
-      name: 'accordion-storage', // Ключ в localStorage
-      storage: createJSONStorage(() => compressedStorage), // Используем кастомное хранилище
+      name: 'accordion-storage',
+      storage: createJSONStorage(() => compressedStorage),
       partialize: (state) => ({
         openBlocks: state.openBlocks,
         loadedChunks: state.loadedChunks,
@@ -84,3 +90,63 @@ export const useStore = create<StoreState>()(
     }
   )
 );
+
+// Очередь задач для воркеров
+class WorkerQueue {
+  private queue: { id: number; data: unknown }[] = [];
+  private activeWorkers = 0;
+  private stopped = false;
+
+  constructor(private maxWorkers: number) {}
+
+  addTask(id: number, data: unknown) {
+    if (this.stopped || useStore.getState().results[id]) return; // Не добавляем, если уже есть результат
+    this.queue.push({ id, data });
+    this.processQueue();
+  }
+
+  stop() {
+    this.stopped = true;
+    this.queue = [];
+  }
+
+  private processQueue() {
+    if (this.stopped || this.activeWorkers >= this.maxWorkers || this.queue.length === 0) return;
+
+    const task = this.queue.shift()!;
+    this.activeWorkers++;
+
+    const store = useStore.getState();
+    const worker = initializeWorker(`calculator-${task.id}`, (error) => {
+      console.error(`Ошибка в воркере для блока ${task.id}:`, error);
+      store.setResult(task.id, {
+        input: 0,
+        result: `Ошибка: ${error}`,
+        calculationTime: 0,
+        timestamp: new Date().toISOString()
+      });
+      this.activeWorkers--;
+      this.processQueue();
+    });
+
+    if (worker) {
+      worker.postMessage({ id: task.id, data: task.data });
+      worker.onmessage = (e) => {
+        console.log(`Результат от воркера для блока ${task.id}:`, e.data);
+        store.setResult(task.id, e.data);
+        worker.terminate();
+        this.activeWorkers--;
+        setTimeout(() => this.processQueue(), 100); // Пауза 100 мс
+      };
+    } else {
+      this.activeWorkers--;
+      this.processQueue();
+    }
+  }
+}
+
+const workerQueue = new WorkerQueue(MAX_WORKERS);
+
+export const stopBackgroundCalculations = () => {
+  workerQueue.stop();
+};
