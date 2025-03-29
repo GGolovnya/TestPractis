@@ -18,6 +18,10 @@
   .buttonBlockOpenClose.open {
     background-color: #1a1a1a; /* Цвет при открытом состоянии */
   }
+
+  .buttonBlockOpenClose.calculated {
+    color: rgb(46, 241, 124); /* Зелёный цвет для индикатора вычислений */
+  }
   
   .contentAccordionBlock {
     color: rgb(46, 124, 241); /* Синий текст */

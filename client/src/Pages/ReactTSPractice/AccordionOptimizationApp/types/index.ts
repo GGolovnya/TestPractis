@@ -4,13 +4,14 @@ export interface ChunkData {
     data: Record<string, unknown>;
   }
   
-  export interface StoreState {
-    openBlocks: Record<string, boolean>;
-    loadedChunks: Record<string, boolean>;
-    data: Record<string, string>;
-    results: Record<string, unknown>;
-    loadChunk: (chunkId: number) => Promise<void>;
-    getData: (id: number) => Record<string, unknown> | null;
-    setBlockOpen: (id: number, isOpen: boolean) => void;
-    setResult: (id: number, result: unknown) => void;
-  }
+// src/types.ts
+export interface StoreState {
+  openBlocks: Record<number, boolean>;
+  loadedChunks: Record<number, boolean>;
+  data: Record<number, Record<number, unknown>>; // Уточняем, что внутри чанка — объект  results: Record<number, unknown>; // Результаты вычислений
+  results: Record<number, unknown>;  // Добавьте это поле
+  loadChunk: (chunkId: number) => Promise<void>;
+  getData: (id: number) => unknown;
+  setBlockOpen: (id: number, isOpen: boolean) => void;
+  setResult: (id: number, result: unknown) => void;
+}

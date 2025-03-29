@@ -11,10 +11,11 @@ const CHUNK_SIZE = 100;
 
 export const AccordionBlock: React.FC<AccordionBlockProps> = React.memo(({ id }) => {
 
-    const { openBlocks, setBlockOpen, loadChunk, getData } = useStore(); //берет состояние из стора
+    const { openBlocks, setBlockOpen, loadChunk, getData, results } = useStore(); //берет состояние из стора
     const isOpen = openBlocks[id] || false; // определяем, открыт ли текущий блок 
     const chunkId = Math.floor(id / CHUNK_SIZE);
     const data = getData(id);
+    const hasResult = !!results[id]
 
     useEffect(() => {
         console.log(`Загрузка чанка ${chunkId} для бока ${id}`)
@@ -32,8 +33,8 @@ export const AccordionBlock: React.FC<AccordionBlockProps> = React.memo(({ id })
         <div className='accordionBlock'>
             <button 
                 onClick={handleBlockOpenClose}
-                className={`buttonBlockOpenClose ${isOpen ? 'open' : ''}`}>
-                {isOpen ? '▼' : '►'} Блок {id}
+                className={`buttonBlockOpenClose ${isOpen ? 'open' : ''} ${hasResult ? 'calculated' : ''} `}>
+                {isOpen ? '▼' : '►'} Блок {id} {hasResult && !isOpen ? '  ✔' : ''}
             </button>
             {isOpen && 
                 <div className="contentAccordionBlock">

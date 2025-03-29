@@ -5,6 +5,8 @@ import './AccordionOptimization.css';
 import { useNavigate } from 'react-router-dom';
 
 export const AccordionOptimization: React.FC = () => {
+  const totalItems = 3000; // Определяем здесь количество элементов
+
   const navigate = useNavigate()
   console.log('AccordionOptimization рендерится');
   return (
@@ -13,7 +15,8 @@ export const AccordionOptimization: React.FC = () => {
         <h1>Аккордеон с оптимизацией</h1>
       </header>
       <main className="page-content">
-        <AccordionContainer />
+        <h2> Всего блоков: {totalItems} </h2>
+        <AccordionContainer totalItems={totalItems} />
       </main>
       <button 
         style={{marginTop: 20}}

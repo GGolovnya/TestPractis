@@ -44,6 +44,12 @@ export const StatisticsBlock: React.FC<StatisticsBlockProps> = React.memo(({ id,
 
   console.log(`StatisticsBlock ${id} рендерится, результат:`, result);
 
+  // Форматирование времени с проверкой единиц
+  const formatTime = (time: number) => {
+    const seconds = time / 1000;
+    return `${seconds.toFixed(2)} сек`;
+  };
+  
   // Функция для форматирования даты (timestamp → "28 марта 2025, 14:30")
   const formateDate = (timestamp: number) => {
     return new Date(timestamp).toLocaleString('ru-RU', {
@@ -65,7 +71,7 @@ export const StatisticsBlock: React.FC<StatisticsBlockProps> = React.memo(({ id,
             Результат: {result.result}
           </div>
           <div className='calculationTimeCard'>
-            Время вычисления: {result.calculationTime}
+            Время вычисления: {formatTime(result.calculationTime)}
           </div>
           <div className='timestampCard'>
             Дата: {formateDate(result.timestamp)}
