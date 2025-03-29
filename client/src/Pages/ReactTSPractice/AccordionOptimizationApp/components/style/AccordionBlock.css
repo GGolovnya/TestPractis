@@ -1,20 +1,26 @@
 .accordionBlock {
     margin-bottom: 10px;
     color: #ffffff;
-}
-
-.buttonBlockOpenClose {
-width: 100%;
-color: rgb(241, 156, 46);
-text-align: left;
-display: block; /* Чтобы text-align работал */
-}
-
-.buttonBlockOpenClose.open {
-background-color: #1a1a1a; /* Цвет при открытом состоянии */
-}
-
-.contentAccordionBlock {
-color: rgb(46, 124, 241);
-padding: 20px;
-}
+    background-color: #2a2a2a; /* Добавлен фон для консистентности */
+    border: 1px solid #444; /* Добавлена граница, как в инлайн-стилях */
+  }
+  
+  .buttonBlockOpenClose {
+    width: 100%;
+    color: rgb(241, 156, 46); /* Оранжевый текст */
+    text-align: left;
+    display: block;
+    padding: 10px; /* Добавлен отступ */
+    background-color: #333; /* Базовый цвет кнопки */
+    border: none; /* Убрана стандартная граница кнопки */
+  }
+  
+  .buttonBlockOpenClose.open {
+    background-color: #1a1a1a; /* Цвет при открытом состоянии */
+  }
+  
+  .contentAccordionBlock {
+    color: rgb(46, 124, 241); /* Синий текст */
+    padding: 20px;
+    border-top: 1px solid #444; /* Добавлена верхняя граница */
+  }

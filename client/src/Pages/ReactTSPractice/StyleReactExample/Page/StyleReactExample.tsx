@@ -6,6 +6,7 @@ import { InlineComponent } from '../components/inlineStyle/InlineComponent'
 import { StyledComponentsComponent } from '../components/styledComponents/StyledComponentsComponent'
 import { EmotionComponent } from '../components/emotion/EmotionComponent'
 import { CSSModulesComponent } from '../components/cssModules/CSSModulesComponent'
+import { PreprocessorComponent } from '../components/preprocessors/PreprocessorComponent'
 
 const styleButton = {
   marginTop: 20,
@@ -23,6 +24,7 @@ export const StyleReactExample = () => {
           <StyledComponentsComponent/>
           <EmotionComponent/>
           <CSSModulesComponent/>
+          <PreprocessorComponent/>
         </div>
         <button
           style={styleButton}

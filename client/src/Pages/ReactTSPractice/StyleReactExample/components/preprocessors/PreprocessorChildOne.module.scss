@@ -1,0 +1,35 @@
+$card-bg: #50c42d; // Базовый коричневый цвет
+$card-hover: darken($card-bg, 10%);
+
+.cardContainer {
+  display: flex;
+  border-radius: 20px;
+  margin: 0 10px;
+  gap: 10px;
+}
+
+.cardTop {
+  flex: 1;
+  background-color: lighten($card-bg, 20%); // Светло-коричневый
+  padding: 10px;
+  border-radius: 20px;
+  transition: transform 0.3s ease-in-out;
+
+  &:hover {
+    background-color: $card-hover;
+    transform: scale(1.05);
+  }
+}
+
+.cardBottom {
+  flex: 1;
+  background-color: $card-bg; // Темно-коричневый
+  padding: 10px;
+  border-radius: 20px;
+  transition: transform 0.3s ease-in-out;
+
+  &:hover {
+    background-color: darken($card-bg, 20%);
+    transform: scale(1.05);
+  }
+}

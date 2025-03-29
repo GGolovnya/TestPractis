@@ -1,0 +1,27 @@
+.ConrainerStatisticBlock { /* Исправим опечатку: Conrainer → Container */
+    padding: 10px;
+    background-color: #2a2a2a; /* Тёмный фон, как в AccordionBlock */
+    color: #ffffff; /* Белый текст для читаемости */
+    border-radius: 10px;
+  }
+  
+  /* Стили для каждой карточки */
+  .inputCard {
+    margin-bottom: 8px;
+    color: rgb(241, 156, 46); /* Оранжевый, как в кнопке AccordionBlock */
+  }
+  
+  .resultCard {
+    margin-bottom: 8px;
+    color: rgb(46, 124, 241); /* Синий, как в contentAccordionBlock */
+    font-weight: bold; /* Выделяем результат */
+  }
+  
+  .calculationTimeCard {
+    margin-bottom: 8px;
+    color: #ffffff; /* Белый для нейтральности */
+  }
+  
+  .timestampCard {
+    color: #cccccc; /* Светло-серый для даты */
+  }

@@ -1,0 +1,36 @@
+$button-base: #2b6cb0; // Базовый синий цвет
+$button-active: #9f7aea; // Фиолетовый для активного состояния
+
+@mixin button-styles {
+border-radius: 10px;
+width: 300px;
+padding: 10px;
+border: none;
+cursor: pointer;
+color: white;
+}
+
+.buttonContainer {
+display: flex;
+flex-direction: column;
+align-items: center;
+gap: 20px;
+}
+
+.button {
+@include button-styles;
+background-color: $button-base;
+
+&:hover {
+background-color: lighten($button-base, 10%);
+}
+
+}
+
+.buttonActive {
+background-color: $button-active;
+
+&:hover {
+    background-color: darken($button-active, 10%);
+}
+}

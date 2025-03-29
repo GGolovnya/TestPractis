@@ -1,0 +1,22 @@
+$container-bg: #e2e8f0;
+$text-color: #2d3748;
+
+.mainContainer {
+  width: 600px;
+  height: 500px;
+  background-color: $container-bg;
+  border-radius: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+.title {
+  font-size: 24px;
+  font-weight: bold;
+  color: $text-color;
+  text-align: center;
+  margin: 0;
+}

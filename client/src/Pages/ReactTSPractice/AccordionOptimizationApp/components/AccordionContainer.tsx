@@ -4,6 +4,8 @@ import { AccordionBlock } from './AccordionBlock';
 import '../components/style/index.css'
 
 export const AccordionContainer: React.FC = () => {
+
+    // Указываем параметры для Virtuoso
     const totalItems = 3000; // Задаем количество блоков
 
     console.log ('AccordionContainer рендерится')
