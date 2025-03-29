@@ -150,3 +150,8 @@ const workerQueue = new WorkerQueue(MAX_WORKERS);
 export const stopBackgroundCalculations = () => {
   workerQueue.stop();
 };
+
+export const updateMaxWorkers = (newMaxWorkers: number) => {
+  workerQueue.maxWorkers = Math.max(1, Math.min(8, newMaxWorkers));
+  workerQueue.processQueue(); // Перезапускаем обработку очереди с новым лимитом
+};
