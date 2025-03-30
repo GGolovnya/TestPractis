@@ -1,50 +1,109 @@
-import React, { useCallback, useEffect } from 'react';
-import { useStore } from '../store/store'
-import '../components/style/index.css'
+// src/components/AccordionBlock.tsx
+import React, { useCallback, useEffect, useState } from 'react';
+import { useStore } from '../store/store';
+import '../components/style/index.css';
 import { StatisticsBlock } from './StatisticsBlock';
 
 interface AccordionBlockProps {
-    id: number;
+  id: number;
 }
 
 const CHUNK_SIZE = 100;
 
 export const AccordionBlock: React.FC<AccordionBlockProps> = React.memo(({ id }) => {
+  const {
+    openBlocks,
+    setBlockOpen,
+    loadChunk,
+    getData,
+    results,
+    isBlockProcessing,
+    getBlockStartTime,
+    cancelledTasks,
+    cancelTask,
+    resumeTask,
+  } = useStore();
+  const isOpen = openBlocks[id] || false;
+  const chunkId = Math.floor(id / CHUNK_SIZE);
+  const data = getData(id);
+  const hasResult = !!results[id];
+  const isProcessing = isBlockProcessing(id);
+  const startTime = getBlockStartTime(id);
+  const isCancelled = cancelledTasks[id] || false;
 
-    const { openBlocks, setBlockOpen, loadChunk, getData, results } = useStore(); //берет состояние из стора
-    const isOpen = openBlocks[id] || false; // определяем, открыт ли текущий блок 
-    const chunkId = Math.floor(id / CHUNK_SIZE);
-    const data = getData(id);
-    const hasResult = !!results[id]
+  const [elapsedTime, setElapsedTime] = useState(0);
 
-    useEffect(() => {
-        console.log(`Загрузка чанка ${chunkId} для бока ${id}`)
-        loadChunk(chunkId)
-    },[chunkId, loadChunk])
+  useEffect(() => {
+    loadChunk(chunkId);
+  }, [chunkId, loadChunk]);
 
-    const handleBlockOpenClose = useCallback(() => {
-        console.log(`Тоггл блока ${id}, новое состояние: ${!isOpen}`);
-        setBlockOpen (id, !isOpen);
-    }, [id, isOpen, setBlockOpen])
+  useEffect(() => {
+    if (!isProcessing || !startTime || hasResult || isCancelled) {
+      return;
+    }
 
-    console.log(`AccordionBlock ${id} рендерится, открыт: ${isOpen}, данные:`, data);
+    const interval = setInterval(() => {
+      const now = Date.now();
+      const timeElapsed = (now - startTime) / 1000;
+      setElapsedTime(timeElapsed);
+    }, 100);
 
-    return (
-        <div className='accordionBlock'>
-            <button 
-                onClick={handleBlockOpenClose}
-                className={`buttonBlockOpenClose ${isOpen ? 'open' : ''} ${hasResult ? 'calculated' : ''} `}>
-                {isOpen ? '▼' : '►'} Блок {id} {hasResult && !isOpen ? '  ✔' : ''}
-            </button>
-            {isOpen && 
-                <div className="contentAccordionBlock">
-                    {data ? (
-                        <StatisticsBlock id={id} data={data} />
-                    ) : (
-                        'Загрузка данных...'
-                    )}
-                </div>
-            }
+    return () => clearInterval(interval);
+  }, [isProcessing, startTime, hasResult, isCancelled]);
+
+  const handleBlockOpenClose = useCallback(() => {
+    setBlockOpen(id, !isOpen);
+  }, [id, isOpen, setBlockOpen]);
+
+  const handleCancel = useCallback(() => {
+    cancelTask(id);
+    setElapsedTime(0);
+  }, [id, cancelTask]);
+
+  const handleResume = useCallback(() => {
+    resumeTask(id);
+  }, [id, resumeTask]);
+
+  return (
+    <div className="accordionBlock">
+      <button
+        onClick={handleBlockOpenClose}
+        className={`buttonBlockOpenClose ${isOpen ? 'open' : ''} ${hasResult ? 'calculated' : ''}`}
+      >
+        {isOpen ? '▼' : '►'} Блок {id}
+        {isProcessing && !hasResult && !isCancelled && (
+          <>
+            <span style={{ color: 'yellow', marginLeft: '5px' }}>●</span>
+            <span style={{ marginLeft: '5px' }}>{elapsedTime.toFixed(1)} сек</span>
+            <span
+              onClick={(e) => {
+                e.stopPropagation();
+                handleCancel();
+              }}
+              style={{ marginLeft: '5px', cursor: 'pointer' }}
+            >
+              ✖
+            </span>
+          </>
+        )}
+        {isCancelled && !hasResult && (
+          <span
+            onClick={(e) => {
+              e.stopPropagation();
+              handleResume();
+            }}
+            style={{ marginLeft: '5px', cursor: 'pointer' }}
+          >
+            ▶
+          </span>
+        )}
+        {hasResult && !isOpen && ' ✔'}
+      </button>
+      {isOpen && (
+        <div className="contentAccordionBlock">
+          {data ? <StatisticsBlock id={id} data={data} /> : 'Загрузка данных...'}
         </div>
-    );
+      )}
+    </div>
+  );
 });
