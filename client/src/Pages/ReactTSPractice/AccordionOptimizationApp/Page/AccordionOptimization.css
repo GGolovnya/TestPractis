@@ -17,14 +17,19 @@
   flex-wrap: nowrap;
   justify-items: left;
   gap: 20px;
+  position: relative; /* Делаем контейнер относительным для абсолютного позиционирования */
 }
 
 .inputSetItems{
 
 }
 
+.inputSetItems--error {
+  border-color: red; /* Красная рамка при ошибке */
+}
+
 .buttonSetItems{
-  
+
 }
 
 .statisticHardWorkerContainer{
@@ -34,4 +39,10 @@
 .inputSetWorker{
   margin-left: 10;
   width: 50
+}
+
+.error {
+  color: red;
+  margin: auto;
+  font-size: small;
 }

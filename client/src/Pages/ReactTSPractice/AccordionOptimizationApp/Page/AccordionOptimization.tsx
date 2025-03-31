@@ -6,12 +6,13 @@ import './AccordionOptimization.css';
 import { useNavigate } from 'react-router-dom';
 
 export const AccordionOptimization: React.FC = () => {
+  const navigate = useNavigate();
   const [totalItems, setTotalItems] = useState<number>(() => {
     const savedItems = localStorage.getItem('totalItems');
     return savedItems ? parseInt(savedItems, 10) : 200;
   }); // управляет значением в <totalItems>
   const [inputValue, setInputValue] = useState<string>('') // управляет значением в <input></input>
-  const navigate = useNavigate();
+  const [error, setError] = useState<string>('')
   const [memoryStats, setMemoryStats] = useState<{
     usedJSHeapSize: number;
     totalJSHeapSize: number;
@@ -32,6 +33,7 @@ export const AccordionOptimization: React.FC = () => {
     localStorage.setItem('totalItems', totalItems.toString())
   }, [totalItems])
 
+  // Обновление статистики памяти
   useEffect(() => {
     const updateMemoryStats = () => {
       if ('memory' in performance) {
@@ -47,6 +49,7 @@ export const AccordionOptimization: React.FC = () => {
     return () => clearInterval(interval);
   }, []);
 
+  // Переключение режима отладки
   useEffect(() => {
     const originalConsoleLog = console.log;
     console.log = debugMode ? originalConsoleLog : () => {};
@@ -55,6 +58,24 @@ export const AccordionOptimization: React.FC = () => {
     };
   }, [debugMode]);
 
+  // Валидация inputValue при каждом изменении
+  useEffect(() => {
+    if(inputValue === '') {
+      setError(''); // нет ошибки
+      return;
+    }
+
+    const num = parseInt(inputValue, 10);
+
+    if (num < 1) {
+      setError('Число должно быть не меньше 1');
+    } else if (num > 30000) {
+      setError('Число не должно быть больше 30000')
+    } else {
+      setError('') // Все в порядке
+    }
+  },[inputValue])
+
   const handleMaxWorkersChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newValue = Math.max(1, Math.min(8, parseInt(e.target.value) || 4));
     setMaxWorkers(newValue);
@@ -62,7 +83,10 @@ export const AccordionOptimization: React.FC = () => {
 
   // Обработчик изменения значения в input
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
+    let value = e.target.value
+    if (value.length > 1) {
+      value = value.replace(/^0+/, '')
+    }
     setInputValue(value); // Обновляем значение в input
   };
 
@@ -84,7 +108,7 @@ export const AccordionOptimization: React.FC = () => {
           <div className='formSetItems'>
             <input
               placeholder='Задать кол-во блоков'
-              className='inputSetItems'
+              className={`inputSetItems ${error ? 'inputSetItems--error' : ''}`}
               type='number'
               value={inputValue}
               onChange={handleInputChange}
@@ -92,9 +116,11 @@ export const AccordionOptimization: React.FC = () => {
             <button 
               className='buttonSetItems'
               onClick={handleButtonSetItems}
+              disabled={!!error || inputValue === ''}
             >
               Задать
             </button>
+            {error && <p className='error'>{error}</p>}
           </div>
         <div className='statisticHardWorkerContainer'>
           <h3>Мониторинг производительности</h3>
