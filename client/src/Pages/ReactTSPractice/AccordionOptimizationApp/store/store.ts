@@ -148,6 +148,8 @@ export const useStore = create<StoreState>()(
       data: {},
       results: {},
       cancelledTasks: {},
+      
+      resetResults: () => set({ results: {} }),
 
       loadChunk: async (chunkId: number) => {
         if (get().loadedChunks[chunkId]) return;

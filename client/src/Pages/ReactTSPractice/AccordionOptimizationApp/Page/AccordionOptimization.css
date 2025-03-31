@@ -3,3 +3,35 @@
     background-color: #242424;
     color: rgba(255, 255, 255, 0.87);
   }
+
+.page-header{
+
+}
+
+.page-content{
+
+}
+
+.formSetItems{
+  display: flex;
+  flex-wrap: nowrap;
+  justify-items: left;
+  gap: 20px;
+}
+
+.inputSetItems{
+
+}
+
+.buttonSetItems{
+  
+}
+
+.statisticHardWorkerContainer{
+  margin-bottom: 20,
+}
+
+.inputSetWorker{
+  margin-left: 10;
+  width: 50
+}

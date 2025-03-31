@@ -10,6 +10,7 @@ export interface StoreState {
   data: Record<number, Record<number, unknown>>;
   results: Record<number, unknown>;
   cancelledTasks: Record<number, boolean>;
+  resetResults: () => void; // Добавляем resetResults в интерфейс
   loadChunk: (chunkId: number) => Promise<void>;
   getData: (id: number) => unknown;
   setBlockOpen: (id: number, isOpen: boolean) => void;

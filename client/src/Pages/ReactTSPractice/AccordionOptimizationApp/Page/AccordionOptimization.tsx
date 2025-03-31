@@ -6,23 +6,40 @@ import './AccordionOptimization.css';
 import { useNavigate } from 'react-router-dom';
 
 export const AccordionOptimization: React.FC = () => {
-  const totalItems = 200;
+  const [totalItems, setTotalItems] = useState<number>(() => {
+    const savedItems = localStorage.getItem('totalItems');
+    return savedItems ? parseInt(savedItems, 10) : 200;
+  }); // управляет значением в <totalItems>
+  const [inputValue, setInputValue] = useState<string>('') // управляет значением в <input></input>
   const navigate = useNavigate();
-  const [memoryStats, setMemoryStats] = useState({
+  const [memoryStats, setMemoryStats] = useState<{
+    usedJSHeapSize: number;
+    totalJSHeapSize: number;
+    jsHeapSizeLimit: number;
+  }>({
     usedJSHeapSize: 0,
     totalJSHeapSize: 0,
     jsHeapSizeLimit: 0,
   });
-  const [maxWorkers, setMaxWorkers] = useState(4);
-  const { results } = useStore();
+  const [maxWorkers, setMaxWorkers] = useState<number>(4);
+  const { results, resetResults } = useStore();
   const calculatedCount = Object.keys(results).length;
   const progress = (calculatedCount / totalItems) * 100;
-  const [debugMode, setDebugMode] = useState(false);
+  const [debugMode, setDebugMode] = useState<boolean>(false);
+
+  // Сохраняем totalItems в localStorage при каждом его изменении
+  useEffect (() => {
+    localStorage.setItem('totalItems', totalItems.toString())
+  }, [totalItems])
 
   useEffect(() => {
     const updateMemoryStats = () => {
       if ('memory' in performance) {
-        const { usedJSHeapSize, totalJSHeapSize, jsHeapSizeLimit } = performance.memory;
+        const { usedJSHeapSize, totalJSHeapSize, jsHeapSizeLimit } = performance.memory as {
+          usedJSHeapSize: number;
+          totalJSHeapSize: number;
+          jsHeapSizeLimit: number;
+        };
         setMemoryStats({ usedJSHeapSize, totalJSHeapSize, jsHeapSizeLimit });
       }
     };
@@ -43,6 +60,20 @@ export const AccordionOptimization: React.FC = () => {
     setMaxWorkers(newValue);
   };
 
+  // Обработчик изменения значения в input
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setInputValue(value); // Обновляем значение в input
+  };
+
+  // Обработчик кнопки "Задать"
+  const handleButtonSetItems = () => {
+    const newValue = Math.max(1, Math.min(30000, parseInt(inputValue) || 200)) // Ограничения: 1–30,000
+    setTotalItems(newValue);
+    setInputValue(newValue.toString());// Синхронизируем input с totalItems
+    resetResults();
+  };
+
   return (
     <div className="page-container">
       <header className="page-header">
@@ -50,7 +81,22 @@ export const AccordionOptimization: React.FC = () => {
       </header>
       <main className="page-content">
         <h2>Всего блоков: {totalItems}</h2>
-        <div style={{ marginBottom: 20 }}>
+          <div className='formSetItems'>
+            <input
+              placeholder='Задать кол-во блоков'
+              className='inputSetItems'
+              type='number'
+              value={inputValue}
+              onChange={handleInputChange}
+            />
+            <button 
+              className='buttonSetItems'
+              onClick={handleButtonSetItems}
+            >
+              Задать
+            </button>
+          </div>
+        <div className='statisticHardWorkerContainer'>
           <h3>Мониторинг производительности</h3>
           <p>Используемая память: {(memoryStats.usedJSHeapSize / 1024 / 1024).toFixed(2)} MB</p>
           <p>Общий размер кучи: {(memoryStats.totalJSHeapSize / 1024 / 1024).toFixed(2)} MB</p>
@@ -58,12 +104,12 @@ export const AccordionOptimization: React.FC = () => {
           <label>
             Макс. воркеров (1-8):
             <input
+              className='inputSetWorker'
               type="number"
               value={maxWorkers}
               min={1}
               max={8}
               onChange={handleMaxWorkersChange}
-              style={{ marginLeft: 10, width: 50 }}
             />
           </label>
           <label style={{ marginLeft: 20 }}>
