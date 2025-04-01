@@ -1,4 +1,3 @@
-// src/Pages/AccordionOptimization.tsx
 import React, { useState, useEffect } from 'react';
 import { AccordionContainer } from '../components/AccordionContainer';
 import { useStore } from '../store/store';
@@ -10,7 +9,7 @@ export const AccordionOptimization: React.FC = () => {
   const navigate = useNavigate();
   const [totalItems, setTotalItems] = useState<number>(() => {
     const savedItems = localStorage.getItem('totalItems');
-    return savedItems ? parseInt(savedItems, 10) : 1000; // Увеличили до 1000
+    return savedItems ? parseInt(savedItems, 10) : 1000;
   });
   const [inputValue, setInputValue] = useState<string>('');
   const [error, setError] = useState<string>('');
@@ -24,7 +23,10 @@ export const AccordionOptimization: React.FC = () => {
     jsHeapSizeLimit: 0,
   });
   const [maxWorkers, setMaxWorkers] = useState<number>(4);
-  const { results, resetResults, isServerMode, setServerMode, useFixedN, setUseFixedN } = useStore();
+  // PINK: Добавляем состояния для фиксированного n и флажка
+  const [customN, setCustomN] = useState<number>(46);
+  const [useFixedN, setUseFixedN] = useState<boolean>(false);
+  const { results, resetResults, isServerMode, setServerMode, setCustomN: setStoreCustomN, setUseFixedN: setStoreUseFixedN } = useStore();
   const calculatedCount = Object.keys(results).length;
   const progress = (calculatedCount / totalItems) * 100;
   const [debugMode, setDebugMode] = useState<boolean>(false);
@@ -61,7 +63,6 @@ export const AccordionOptimization: React.FC = () => {
       setError('');
       return;
     }
-
     const num = parseInt(inputValue, 10);
     if (num < 1) {
       setError('Число должно быть не меньше 1');
@@ -84,6 +85,21 @@ export const AccordionOptimization: React.FC = () => {
       value = value.replace(/^0+/, '');
     }
     setInputValue(value);
+  };
+
+  // PINK: Обработчик для изменения customN
+  const handleCustomNChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = parseInt(e.target.value) || 1;
+    const newValue = Math.max(1, Math.min(50, value));
+    setCustomN(newValue);
+    setStoreCustomN(newValue);
+  };
+
+  // PINK: Обработчик для переключения флажка
+  const handleUseFixedNChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const checked = e.target.checked;
+    setUseFixedN(checked);
+    setStoreUseFixedN(checked);
   };
 
   const handleButtonSetItems = () => {
@@ -145,12 +161,22 @@ export const AccordionOptimization: React.FC = () => {
               onChange={(e) => setServerMode(e.target.checked)}
             />
           </label>
+          {/* PINK: Изменяем интерфейс для n */}
           <label style={{ marginLeft: 20 }}>
-            Фиксированный n (46):
+            Задать фиксированный n:
             <input
               type="checkbox"
               checked={useFixedN}
-              onChange={(e) => setUseFixedN(e.target.checked)}
+              onChange={handleUseFixedNChange}
+            />
+            <input
+              type="number"
+              value={customN}
+              min={1}
+              max={50}
+              onChange={handleCustomNChange}
+              disabled={!useFixedN}
+              style={{ width: '60px', marginLeft: '5px' }}
             />
           </label>
           <div style={{ marginBottom: 20 }}>

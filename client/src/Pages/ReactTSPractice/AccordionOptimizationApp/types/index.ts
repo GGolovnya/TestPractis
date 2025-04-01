@@ -1,4 +1,3 @@
-// src/types/index.ts
 export interface ChunkData {
   id: number;
   data: Record<string, unknown>;
@@ -15,15 +14,20 @@ export interface StoreState {
   openBlocks: Record<number, boolean>;
   loadedChunks: Record<number, boolean>;
   data: Record<number, Record<number, unknown>>;
-  results: Record<number, CalculationResult>; // Уточняем тип результатов
+  results: Record<number, CalculationResult>;
   cancelledTasks: Record<number, boolean>;
-  isServerMode: boolean; // Добавляем в интерфейс
-  resetResults: () => void; // Добавляем resetResults в интерфейс
-  setServerMode: (mode: boolean) => void; // Добавляем setServerMode
+  isServerMode: boolean;
+  // PINK: Добавляем customN и useFixedN в интерфейс
+  customN: number;
+  useFixedN: boolean;
+  resetResults: () => void;
+  setServerMode: (mode: boolean) => void;
+  setCustomN: (n: number) => void;
+  setUseFixedN: (useFixed: boolean) => void;
   loadChunk: (chunkId: number) => Promise<void>;
   getData: (id: number) => unknown;
   setBlockOpen: (id: number, isOpen: boolean) => void;
-  setResult: (id: number, result: CalculationResult) => void; // Уточняем тип результата
+  setResult: (id: number, result: CalculationResult) => void;
   cancelTask: (id: number) => void;
   resumeTask: (id: number) => void;
   resetStore: () => void;

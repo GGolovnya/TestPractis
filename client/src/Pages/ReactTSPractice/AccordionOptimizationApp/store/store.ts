@@ -1,4 +1,3 @@
-// src/store/store.ts
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import { compress, decompress } from 'lz-string';
@@ -39,13 +38,13 @@ class WorkerQueue {
 
   constructor(public maxWorkers: number) {}
 
-  addTask(id: number, data: unknown, isServerMode: boolean, useFixedN: boolean) {
+  // PINK: Изменяем addTask для учета useFixedN
+  addTask(id: number, data: unknown, isServerMode: boolean, customN: number, useFixedN: boolean) {
     if (useStore.getState().results[id] || this.processingIds.has(id)) return;
     if (!this.queue.some((task) => task.id === id)) {
       const startTime = Date.now();
       this.queue.push({ id, data, startTime });
-      console.log(`Задача добавлена в очередь: id=${id}, isServerMode=${isServerMode}, useFixedN=${useFixedN}`);
-      this.processQueue(isServerMode, useFixedN);
+      this.processQueue(isServerMode, customN, useFixedN);
     }
   }
 
@@ -56,8 +55,7 @@ class WorkerQueue {
       activeTask.worker.terminate();
       this.processingIds.delete(id);
       this.activeWorkers--;
-      console.log(`Задача отменена: id=${id}, activeWorkers=${this.activeWorkers}`);
-      this.processQueue(useStore.getState().isServerMode, useStore.getState().useFixedN);
+      this.processQueue(useStore.getState().isServerMode, useStore.getState().customN, useStore.getState().useFixedN);
     }
   }
 
@@ -69,7 +67,6 @@ class WorkerQueue {
     for (const task of this.queue) {
       store.cancelTask(task.id);
     }
-    console.log('Все вычисления приостановлены');
   }
 
   resumeAll() {
@@ -79,14 +76,10 @@ class WorkerQueue {
         store.resumeTask(Number(id));
       }
     }
-    console.log('Все вычисления возобновлены');
   }
 
   isProcessing(id: number): boolean {
-    return (
-      this.processingIds.has(id) ||
-      this.queue.some((task) => task.id === id)
-    );
+    return this.processingIds.has(id) || this.queue.some((task) => task.id === id);
   }
 
   getStartTime(id: number): number | undefined {
@@ -101,36 +94,32 @@ class WorkerQueue {
     this.processingIds.forEach((task) => task.worker?.terminate());
     this.processingIds.clear();
     this.activeWorkers = 0;
-    console.log('Все воркеры и очередь очищены');
   }
 
-  private async processQueue(isServerMode: boolean, useFixedN: boolean) {
-    console.log(`processQueue: activeWorkers=${this.activeWorkers}, queue.length=${this.queue.length}, maxWorkers=${this.maxWorkers}`);
+  // PINK: Изменяем processQueue для учета useFixedN
+  private async processQueue(isServerMode: boolean, customN: number, useFixedN: boolean) {
     if (this.activeWorkers >= this.maxWorkers || this.queue.length === 0) return;
 
     const task = this.queue.shift()!;
     this.activeWorkers++;
     this.processingIds.set(task.id, { startTime: task.startTime });
-    console.log(`Обрабатываем задачу: id=${task.id}, isServerMode=${isServerMode}, useFixedN=${useFixedN}`);
 
     if (isServerMode) {
       fetch('http://localhost:3000/api/v1/fibonacci', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ id: task.id, data: task.data, useFixedN }), // Передаём флаг серверу
+        body: JSON.stringify({ id: task.id, data: task.data, n: useFixedN ? customN : null }),
       })
         .then((response) => {
           if (!response.ok) throw new Error('Server error');
           return response.json();
         })
         .then((result) => {
-          console.log('Результат от сервера:', result);
           useStore.getState().setResult(task.id, result);
         })
         .catch((error) => {
-          console.error('Ошибка при запросе к серверу:', error);
           useStore.getState().setResult(task.id, {
-            input: 0,
+            input: useFixedN ? customN : Math.floor(Math.random() * 15) + 33,
             result: `Ошибка: ${error.message}`,
             calculationTime: 0,
             timestamp: new Date().toISOString(),
@@ -139,41 +128,37 @@ class WorkerQueue {
         .finally(() => {
           this.activeWorkers--;
           this.processingIds.delete(task.id);
-          console.log(`Серверная задача завершена: id=${task.id}, activeWorkers=${this.activeWorkers}`);
-          this.processQueue(isServerMode, useFixedN);
+          this.processQueue(isServerMode, customN, useFixedN);
         });
-      this.processQueue(isServerMode, useFixedN); // Параллельность
+      this.processQueue(isServerMode, customN, useFixedN);
     } else {
       const worker = initializeWorker(`calculator-${task.id}`, (error) => {
         useStore.getState().setResult(task.id, {
-          input: 0,
+          input: useFixedN ? customN : Math.floor(Math.random() * 15) + 33,
           result: `Ошибка: ${error}`,
           calculationTime: 0,
           timestamp: new Date().toISOString(),
         });
         this.activeWorkers--;
         this.processingIds.delete(task.id);
-        console.log(`Клиентская задача с ошибкой: id=${task.id}, activeWorkers=${this.activeWorkers}`);
-        this.processQueue(isServerMode, useFixedN);
+        this.processQueue(isServerMode, customN, useFixedN);
       });
 
       if (worker) {
         this.processingIds.set(task.id, { startTime: task.startTime, worker });
-        const n = useFixedN ? 46 : Math.floor(Math.random() * 15) + 25;
+        const n = useFixedN ? customN : Math.floor(Math.random() * 15) + 33;
         worker.postMessage({ id: task.id, data: task.data, n });
         worker.onmessage = (e) => {
           useStore.getState().setResult(task.id, e.data);
           worker.terminate();
           this.activeWorkers--;
           this.processingIds.delete(task.id);
-          console.log(`Клиентская задача завершена: id=${task.id}, activeWorkers=${this.activeWorkers}`);
-          this.processQueue(isServerMode, useFixedN);
+          this.processQueue(isServerMode, customN, useFixedN);
         };
       } else {
         this.activeWorkers--;
         this.processingIds.delete(task.id);
-        console.log(`Не удалось создать воркер: id=${task.id}, activeWorkers=${this.activeWorkers}`);
-        this.processQueue(isServerMode, useFixedN);
+        this.processQueue(isServerMode, customN, useFixedN);
       }
     }
   }
@@ -190,11 +175,13 @@ export const useStore = create<StoreState>()(
       results: {},
       cancelledTasks: {},
       isServerMode: false,
-      useFixedN: false, // Новое состояние
+      // PINK: Добавляем customN и useFixedN
+      customN: 46,
+      useFixedN: false,
       resetResults: () => set({ results: {} }),
       setServerMode: (mode: boolean) => set({ isServerMode: mode }),
-      setUseFixedN: (useFixed: boolean) => set({ useFixedN: useFixed }), // Новый метод
-
+      setCustomN: (n: number) => set({ customN: n }),
+      setUseFixedN: (useFixed: boolean) => set({ useFixedN: useFixed }),
       loadChunk: async (chunkId: number) => {
         if (get().loadedChunks[chunkId]) return;
         const chunkData = generateMockData(chunkId);
@@ -203,45 +190,39 @@ export const useStore = create<StoreState>()(
           loadedChunks: { ...state.loadedChunks, [chunkId]: true },
         }));
       },
-
       getData: (id: number) => {
         const chunkId = Math.floor(id / CHUNK_SIZE);
         const chunkData = get().data[chunkId];
         return chunkData ? chunkData[id % CHUNK_SIZE] : null;
       },
-
+      // PINK: Передаем useFixedN в addTask
       setBlockOpen: (id: number, isOpen: boolean) => {
         set((state) => ({
           openBlocks: { ...state.openBlocks, [id]: isOpen },
         }));
         if (isOpen && !get().results[id] && !get().cancelledTasks[id]) {
-          workerQueue.addTask(id, get().getData(id), get().isServerMode, get().useFixedN);
-          console.log(`setBlockOpen вызван: id=${id}, isServerMode=${get().isServerMode}, useFixedN=${get().useFixedN}`);
+          workerQueue.addTask(id, get().getData(id), get().isServerMode, get().customN, get().useFixedN);
         }
       },
-
       setResult: (id: number, result: CalculationResult) =>
         set((state) => ({
           results: { ...state.results, [id]: result },
           cancelledTasks: { ...state.cancelledTasks, [id]: false },
         })),
-
       cancelTask: (id: number) => {
         workerQueue.cancelTask(id);
         set((state) => ({
           cancelledTasks: { ...state.cancelledTasks, [id]: true },
         }));
       },
-
       resumeTask: (id: number) => {
         if (!get().results[id]) {
-          workerQueue.addTask(id, get().getData(id), get().isServerMode, get().useFixedN);
+          workerQueue.addTask(id, get().getData(id), get().isServerMode, get().customN, get().useFixedN);
           set((state) => ({
             cancelledTasks: { ...state.cancelledTasks, [id]: false },
           }));
         }
       },
-
       resetStore: () => {
         workerQueue.pauseAll();
         workerQueue.clearWorkers();
@@ -253,9 +234,7 @@ export const useStore = create<StoreState>()(
           cancelledTasks: {},
         });
         localStorage.removeItem('accordion-storage');
-        console.log('Состояние полностью сброшено');
       },
-
       isBlockProcessing: (id: number) => workerQueue.isProcessing(id),
       isPaused: () => false,
       getBlockStartTime: (id: number) => workerQueue.getStartTime(id),
@@ -270,6 +249,8 @@ export const useStore = create<StoreState>()(
         results: state.results,
         cancelledTasks: state.cancelledTasks,
         isServerMode: state.isServerMode,
+        // PINK: Сохраняем новые поля в persistent storage
+        customN: state.customN,
         useFixedN: state.useFixedN,
       }),
     }
@@ -286,5 +267,5 @@ export const resumeAllCalculations = () => {
 
 export const updateMaxWorkers = (newMaxWorkers: number) => {
   workerQueue.maxWorkers = Math.max(1, Math.min(8, newMaxWorkers));
-  workerQueue.processQueue(useStore.getState().isServerMode, useStore.getState().useFixedN);
+  workerQueue.processQueue(useStore.getState().isServerMode, useStore.getState().customN, useStore.getState().useFixedN);
 };
