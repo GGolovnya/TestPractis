@@ -9,6 +9,7 @@ const datatypesexample = require('./datatypesexample.api.router');
 const objectexamples = require('./objectexamples.api.router');
 const product = require('./product.api.router');
 const transaction = require('./transaction.api.router');
+const fibonacci = require('./accordionOptimizationApp.api.router.js')
 
 router.use("/auth", authRouter);
 router.use("/token", tokenRouter);
@@ -20,5 +21,6 @@ router.use('/datatypesexample', datatypesexample);
 router.use('/objectexamples', objectexamples);
 router.use('/product', product);
 router.use('/transaction', transaction);
+router.use('/fibonacci', fibonacci);
 
 module.exports = router;

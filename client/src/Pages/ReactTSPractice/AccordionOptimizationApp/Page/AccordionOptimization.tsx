@@ -4,15 +4,16 @@ import { AccordionContainer } from '../components/AccordionContainer';
 import { useStore } from '../store/store';
 import './AccordionOptimization.css';
 import { useNavigate } from 'react-router-dom';
+import { updateMaxWorkers } from '../store/store';
 
 export const AccordionOptimization: React.FC = () => {
   const navigate = useNavigate();
   const [totalItems, setTotalItems] = useState<number>(() => {
     const savedItems = localStorage.getItem('totalItems');
-    return savedItems ? parseInt(savedItems, 10) : 200;
-  }); // управляет значением в <totalItems>
-  const [inputValue, setInputValue] = useState<string>('') // управляет значением в <input></input>
-  const [error, setError] = useState<string>('')
+    return savedItems ? parseInt(savedItems, 10) : 1000; // Увеличили до 1000
+  });
+  const [inputValue, setInputValue] = useState<string>('');
+  const [error, setError] = useState<string>('');
   const [memoryStats, setMemoryStats] = useState<{
     usedJSHeapSize: number;
     totalJSHeapSize: number;
@@ -23,17 +24,15 @@ export const AccordionOptimization: React.FC = () => {
     jsHeapSizeLimit: 0,
   });
   const [maxWorkers, setMaxWorkers] = useState<number>(4);
-  const { results, resetResults } = useStore();
+  const { results, resetResults, isServerMode, setServerMode, useFixedN, setUseFixedN } = useStore();
   const calculatedCount = Object.keys(results).length;
   const progress = (calculatedCount / totalItems) * 100;
   const [debugMode, setDebugMode] = useState<boolean>(false);
 
-  // Сохраняем totalItems в localStorage при каждом его изменении
-  useEffect (() => {
-    localStorage.setItem('totalItems', totalItems.toString())
-  }, [totalItems])
+  useEffect(() => {
+    localStorage.setItem('totalItems', totalItems.toString());
+  }, [totalItems]);
 
-  // Обновление статистики памяти
   useEffect(() => {
     const updateMemoryStats = () => {
       if ('memory' in performance) {
@@ -49,7 +48,6 @@ export const AccordionOptimization: React.FC = () => {
     return () => clearInterval(interval);
   }, []);
 
-  // Переключение режима отладки
   useEffect(() => {
     const originalConsoleLog = console.log;
     console.log = debugMode ? originalConsoleLog : () => {};
@@ -58,43 +56,40 @@ export const AccordionOptimization: React.FC = () => {
     };
   }, [debugMode]);
 
-  // Валидация inputValue при каждом изменении
   useEffect(() => {
-    if(inputValue === '') {
-      setError(''); // нет ошибки
+    if (inputValue === '') {
+      setError('');
       return;
     }
 
     const num = parseInt(inputValue, 10);
-
     if (num < 1) {
       setError('Число должно быть не меньше 1');
     } else if (num > 30000) {
-      setError('Число не должно быть больше 30000')
+      setError('Число не должно быть больше 30000');
     } else {
-      setError('') // Все в порядке
+      setError('');
     }
-  },[inputValue])
+  }, [inputValue]);
 
   const handleMaxWorkersChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newValue = Math.max(1, Math.min(8, parseInt(e.target.value) || 4));
     setMaxWorkers(newValue);
+    updateMaxWorkers(newValue);
   };
 
-  // Обработчик изменения значения в input
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    let value = e.target.value
+    let value = e.target.value;
     if (value.length > 1) {
-      value = value.replace(/^0+/, '')
+      value = value.replace(/^0+/, '');
     }
-    setInputValue(value); // Обновляем значение в input
+    setInputValue(value);
   };
 
-  // Обработчик кнопки "Задать"
   const handleButtonSetItems = () => {
-    const newValue = Math.max(1, Math.min(30000, parseInt(inputValue) || 200)) // Ограничения: 1–30,000
+    const newValue = Math.max(1, Math.min(30000, parseInt(inputValue) || 1000));
     setTotalItems(newValue);
-    setInputValue(newValue.toString());// Синхронизируем input с totalItems
+    setInputValue(newValue.toString());
     resetResults();
   };
 
@@ -105,24 +100,24 @@ export const AccordionOptimization: React.FC = () => {
       </header>
       <main className="page-content">
         <h2>Всего блоков: {totalItems}</h2>
-          <div className='formSetItems'>
-            <input
-              placeholder='Задать кол-во блоков'
-              className={`inputSetItems ${error ? 'inputSetItems--error' : ''}`}
-              type='number'
-              value={inputValue}
-              onChange={handleInputChange}
-            />
-            <button 
-              className='buttonSetItems'
-              onClick={handleButtonSetItems}
-              disabled={!!error || inputValue === ''}
-            >
-              Задать
-            </button>
-            {error && <p className='error'>{error}</p>}
-          </div>
-        <div className='statisticHardWorkerContainer'>
+        <div className="formSetItems">
+          <input
+            placeholder="Задать кол-во блоков"
+            className={`inputSetItems ${error ? 'inputSetItems--error' : ''}`}
+            type="number"
+            value={inputValue}
+            onChange={handleInputChange}
+          />
+          <button
+            className="buttonSetItems"
+            onClick={handleButtonSetItems}
+            disabled={!!error || inputValue === ''}
+          >
+            Задать
+          </button>
+          {error && <p className="error">{error}</p>}
+        </div>
+        <div className="statisticHardWorkerContainer">
           <h3>Мониторинг производительности</h3>
           <p>Используемая память: {(memoryStats.usedJSHeapSize / 1024 / 1024).toFixed(2)} MB</p>
           <p>Общий размер кучи: {(memoryStats.totalJSHeapSize / 1024 / 1024).toFixed(2)} MB</p>
@@ -130,7 +125,7 @@ export const AccordionOptimization: React.FC = () => {
           <label>
             Макс. воркеров (1-8):
             <input
-              className='inputSetWorker'
+              className="inputSetWorker"
               type="number"
               value={maxWorkers}
               min={1}
@@ -141,6 +136,22 @@ export const AccordionOptimization: React.FC = () => {
           <label style={{ marginLeft: 20 }}>
             Режим отладки:
             <input type="checkbox" checked={debugMode} onChange={(e) => setDebugMode(e.target.checked)} />
+          </label>
+          <label style={{ marginLeft: 20 }}>
+            Серверный режим:
+            <input
+              type="checkbox"
+              checked={isServerMode}
+              onChange={(e) => setServerMode(e.target.checked)}
+            />
+          </label>
+          <label style={{ marginLeft: 20 }}>
+            Фиксированный n (46):
+            <input
+              type="checkbox"
+              checked={useFixedN}
+              onChange={(e) => setUseFixedN(e.target.checked)}
+            />
           </label>
           <div style={{ marginBottom: 20 }}>
             <h3>Прогресс вычислений</h3>
